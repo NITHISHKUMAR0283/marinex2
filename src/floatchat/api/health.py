@@ -15,6 +15,7 @@ from pydantic import BaseModel
 
 from floatchat.core.config import settings
 from floatchat.core.logging import get_logger
+from floatchat.infrastructure.database.service import db_service
 
 logger = get_logger(__name__)
 
@@ -54,22 +55,30 @@ async def check_database_health() -> ComponentHealth:
     start_time = time.time()
     
     try:
-        # This will be implemented when database layer is ready
-        # For now, simulate a database check
-        await asyncio.sleep(0.01)  # Simulate database query
-        
+        # Use actual database service health check
+        health_result = await db_service.health_check()
         response_time = (time.time() - start_time) * 1000
         
-        return ComponentHealth(
-            status="healthy",
-            response_time_ms=round(response_time, 2),
-            message="Database connection successful",
-            details={
-                "driver": "asyncpg",
-                "pool_size": settings.database.database_pool_size,
-                "max_overflow": settings.database.database_max_overflow
-            }
-        )
+        if health_result["status"] == "healthy":
+            return ComponentHealth(
+                status="healthy",
+                response_time_ms=round(response_time, 2),
+                message=health_result["message"],
+                details={
+                    "driver": "asyncpg",
+                    "pool_size": settings.database.database_pool_size,
+                    "max_overflow": settings.database.database_max_overflow,
+                    "tables_found": health_result.get("tables_found"),
+                    "migrations_applied": health_result.get("migrations_applied")
+                }
+            )
+        else:
+            return ComponentHealth(
+                status="unhealthy",
+                response_time_ms=round(response_time, 2),
+                message=health_result["message"],
+                details=health_result
+            )
         
     except Exception as e:
         logger.error("Database health check failed", error=str(e))
@@ -77,7 +86,7 @@ async def check_database_health() -> ComponentHealth:
             status="unhealthy",
             response_time_ms=round((time.time() - start_time) * 1000, 2),
             message=f"Database connection failed: {str(e)}",
-            details={"error": str(e)}
+            details={"error": str(e), "error_type": type(e).__name__}
         )
 
 

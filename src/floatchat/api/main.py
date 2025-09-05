@@ -22,6 +22,7 @@ from floatchat.core.config import settings
 from floatchat.core.logging import get_logger, request_id_var, log_performance, log_error
 from floatchat.core.exceptions import FloatChatException, get_error_context
 from floatchat.api.health import router as health_router
+from floatchat.infrastructure.database.service import db_service
 
 # Initialize logger
 logger = get_logger(__name__)
@@ -74,16 +75,37 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
 
 async def initialize_application() -> None:
     """Initialize application components during startup."""
-    # Initialize database connections, caches, etc.
-    # This will be expanded in later phases
-    pass
+    try:
+        # Initialize database
+        logger.info("Initializing database...")
+        await db_service.initialize_database()
+        logger.info("Database initialization completed")
+        
+        # Additional initialization will be added in later phases
+        # - Redis cache initialization
+        # - AI model loading
+        # - Background task startup
+        
+    except Exception as e:
+        logger.error(f"Failed to initialize application components: {e}")
+        raise
 
 
 async def cleanup_application() -> None:
     """Cleanup application resources during shutdown."""
-    # Close database connections, clean up resources, etc.
-    # This will be expanded in later phases
-    pass
+    try:
+        # Close database connections
+        logger.info("Closing database connections...")
+        await db_service.close()
+        logger.info("Database connections closed")
+        
+        # Additional cleanup will be added in later phases
+        # - Redis connection cleanup
+        # - Background task shutdown
+        # - AI model cleanup
+        
+    except Exception as e:
+        logger.error(f"Error during application cleanup: {e}")
 
 
 def create_application() -> FastAPI:

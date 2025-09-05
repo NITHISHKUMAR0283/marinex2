@@ -222,8 +222,17 @@ app.add_typer(db_app, name="db")
 def db_upgrade():
     """Run database migrations."""
     rprint("[bold blue]Running database migrations...[/bold blue]")
-    # This will be implemented in Phase 1.2
-    rprint("[yellow]Database migration functionality will be implemented in Phase 1.2[/yellow]")
+    
+    async def run_migration():
+        try:
+            from floatchat.infrastructure.database.service import db_service
+            await db_service.initialize_database()
+            rprint("[green]✓ Database migrations completed successfully[/green]")
+        except Exception as e:
+            rprint(f"[red]✗ Migration failed: {e}[/red]")
+            raise typer.Exit(1)
+    
+    asyncio.run(run_migration())
 
 
 @db_app.command("reset")
@@ -240,10 +249,82 @@ def db_reset(
     
     if confirm:
         rprint("[bold red]Resetting database...[/bold red]")
-        # This will be implemented in Phase 1.2
-        rprint("[yellow]Database reset functionality will be implemented in Phase 1.2[/yellow]")
+        
+        async def run_reset():
+            try:
+                from floatchat.infrastructure.database.service import db_service
+                await db_service.reset_database()
+                rprint("[green]✓ Database reset completed successfully[/green]")
+            except Exception as e:
+                rprint(f"[red]✗ Database reset failed: {e}[/red]")
+                raise typer.Exit(1)
+        
+        asyncio.run(run_reset())
     else:
         rprint("[yellow]Database reset cancelled.[/yellow]")
+
+
+@db_app.command("status")
+def db_status():
+    """Show database status and statistics."""
+    rprint("[bold blue]Checking database status...[/bold blue]")
+    
+    async def check_status():
+        try:
+            from floatchat.infrastructure.database.service import db_service
+            
+            # Health check
+            health = await db_service.health_check()
+            
+            if health["status"] == "healthy":
+                rprint("[green]✓ Database is healthy[/green]")
+                rprint(f"[cyan]Response Time:[/cyan] {health.get('response_time_ms', 0):.2f}ms")
+                if "tables_found" in health:
+                    rprint(f"[cyan]Tables Found:[/cyan] {health['tables_found']}")
+                if "migrations_applied" in health:
+                    rprint(f"[cyan]Migrations Applied:[/cyan] {health['migrations_applied']}")
+            else:
+                rprint(f"[red]✗ Database is {health['status']}[/red]")
+                rprint(f"[red]Reason:[/red] {health['message']}")
+                return
+            
+            # Get statistics
+            stats = await db_service.get_database_statistics()
+            
+            if "error" not in stats:
+                rprint("\n[bold]Database Statistics:[/bold]")
+                rprint(f"[cyan]Total Floats:[/cyan] {stats.get('total_floats', 0)}")
+                rprint(f"[cyan]Active Floats:[/cyan] {stats.get('active_floats', 0)}")
+                rprint(f"[cyan]Total Profiles:[/cyan] {stats.get('total_profiles', 0)}")
+                rprint(f"[cyan]Total Measurements:[/cyan] {stats.get('total_measurements', 0)}")
+                
+                if stats.get('latest_profile_date'):
+                    rprint(f"[cyan]Latest Profile:[/cyan] {stats['latest_profile_date']}")
+                if stats.get('earliest_profile_date'):
+                    rprint(f"[cyan]Earliest Profile:[/cyan] {stats['earliest_profile_date']}")
+            
+        except Exception as e:
+            rprint(f"[red]✗ Status check failed: {e}[/red]")
+            raise typer.Exit(1)
+    
+    asyncio.run(check_status())
+
+
+@db_app.command("optimize")
+def db_optimize():
+    """Optimize database performance (VACUUM ANALYZE)."""
+    rprint("[bold blue]Optimizing database performance...[/bold blue]")
+    
+    async def run_optimize():
+        try:
+            from floatchat.infrastructure.database.service import db_service
+            await db_service.vacuum_analyze()
+            rprint("[green]✓ Database optimization completed successfully[/green]")
+        except Exception as e:
+            rprint(f"[red]✗ Database optimization failed: {e}[/red]")
+            raise typer.Exit(1)
+    
+    asyncio.run(run_optimize())
 
 
 # AI commands group
