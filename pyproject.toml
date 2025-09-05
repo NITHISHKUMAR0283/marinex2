@@ -1,0 +1,270 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "floatchat"
+version = "1.0.0"
+description = "AI-Powered Conversational Interface for ARGO Ocean Data Discovery and Visualization"
+authors = [
+    { name = "FloatChat Development Team", email = "floatchat@sih2025.dev" }
+]
+readme = "README.md"
+license = { file = "LICENSE" }
+requires-python = ">=3.9"
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Topic :: Scientific/Engineering :: Oceanography",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+keywords = [
+    "oceanography",
+    "argo",
+    "artificial-intelligence",
+    "conversational-ai",
+    "data-visualization",
+    "netcdf",
+    "marine-science"
+]
+
+dependencies = [
+    # Core Web Framework
+    "fastapi>=0.104.1",
+    "uvicorn[standard]>=0.24.0",
+    "streamlit>=1.28.0",
+    
+    # Database & ORM
+    "sqlalchemy[asyncio]>=2.0.23",
+    "asyncpg>=0.29.0",
+    "alembic>=1.13.0",
+    "psycopg2-binary>=2.9.9",
+    
+    # Redis & Caching
+    "redis>=5.0.1",
+    "aioredis>=2.0.1",
+    
+    # Data Processing & Oceanographic
+    "pandas>=2.1.3",
+    "numpy>=1.24.3",
+    "xarray>=2023.11.0",
+    "netcdf4>=1.6.5",
+    "argopy>=0.1.14",
+    "dask[complete]>=2023.11.0",
+    
+    # AI/ML & Vector Search
+    "langchain>=0.0.350",
+    "langchain-community>=0.0.3",
+    "faiss-cpu>=1.7.4",
+    "sentence-transformers>=2.2.2",
+    "openai>=1.3.7",
+    "anthropic>=0.7.8",
+    
+    # Visualization
+    "plotly>=5.17.0",
+    "folium>=0.15.0",
+    "matplotlib>=3.8.2",
+    "seaborn>=0.13.0",
+    
+    # Data Validation & Configuration
+    "pydantic>=2.5.0",
+    "pydantic-settings>=2.1.0",
+    "python-dotenv>=1.0.0",
+    
+    # Logging & Monitoring
+    "structlog>=23.2.0",
+    "prometheus-client>=0.19.0",
+    "sentry-sdk[fastapi,sqlalchemy]>=1.38.0",
+    
+    # Utilities
+    "httpx>=0.25.2",
+    "aiofiles>=23.2.1",
+    "python-multipart>=0.0.6",
+    "ujson>=5.8.0",
+    "orjson>=3.9.10",
+    "click>=8.1.7",
+    "rich>=13.7.0",
+    "typer>=0.9.0",
+    
+    # Geospatial
+    "geopandas>=0.14.1",
+    "shapely>=2.0.2",
+    "pyproj>=3.6.1",
+    
+    # Scientific Computing
+    "scipy>=1.11.4",
+    "scikit-learn>=1.3.2",
+]
+
+[project.optional-dependencies]
+dev = [
+    # Testing
+    "pytest>=7.4.3",
+    "pytest-asyncio>=0.21.1",
+    "pytest-cov>=4.1.0",
+    "pytest-mock>=3.12.0",
+    "pytest-xdist>=3.5.0",
+    "factory-boy>=3.3.0",
+    
+    # Code Quality
+    "black>=23.11.0",
+    "isort>=5.12.0",
+    "flake8>=6.1.0",
+    "flake8-docstrings>=1.7.0",
+    "mypy>=1.7.1",
+    "pre-commit>=3.6.0",
+    "bandit>=1.7.5",
+    "safety>=2.3.5",
+    
+    # Documentation
+    "sphinx>=7.2.6",
+    "sphinx-rtd-theme>=1.3.0",
+    "myst-parser>=2.0.0",
+    
+    # Development Tools
+    "ipython>=8.17.2",
+    "jupyter>=1.0.0",
+    "notebook>=7.0.6",
+]
+
+performance = [
+    # Performance Testing
+    "locust>=2.17.0",
+    "memory-profiler>=0.61.0",
+    "line-profiler>=4.1.1",
+]
+
+production = [
+    # Production Deployment
+    "gunicorn>=21.2.0",
+    "supervisor>=4.2.5",
+]
+
+[project.urls]
+Homepage = "https://github.com/NITHISHKUMAR0283/marin"
+Repository = "https://github.com/NITHISHKUMAR0283/marin.git"
+Documentation = "https://github.com/NITHISHKUMAR0283/marin/blob/main/README.md"
+Issues = "https://github.com/NITHISHKUMAR0283/marin/issues"
+
+[project.scripts]
+floatchat = "floatchat.cli:main"
+floatchat-server = "floatchat.api.main:run_server"
+floatchat-worker = "floatchat.workers.main:run_worker"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/floatchat"]
+
+[tool.black]
+line-length = 88
+target-version = ['py39']
+include = '\.pyi?$'
+extend-exclude = '''
+/(
+  # directories
+  \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | build
+  | dist
+)/
+'''
+
+[tool.isort]
+profile = "black"
+multi_line_output = 3
+line_length = 88
+known_first_party = ["floatchat"]
+known_third_party = [
+    "fastapi",
+    "sqlalchemy", 
+    "streamlit",
+    "pandas",
+    "numpy",
+    "xarray",
+    "netcdf4",
+    "langchain",
+    "faiss",
+    "openai",
+    "anthropic"
+]
+
+[tool.mypy]
+python_version = "3.9"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_untyped_decorators = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+warn_unreachable = true
+strict_equality = true
+show_error_codes = true
+
+[[tool.mypy.overrides]]
+module = [
+    "netcdf4.*",
+    "argopy.*",
+    "faiss.*",
+    "folium.*",
+]
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py", "*_test.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = [
+    "-ra",
+    "--strict-markers",
+    "--strict-config",
+    "--cov=floatchat",
+    "--cov-report=term-missing",
+    "--cov-report=html",
+    "--cov-fail-under=85",
+]
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "integration: marks tests as integration tests",
+    "unit: marks tests as unit tests",
+    "api: marks tests as API tests",
+    "database: marks tests requiring database",
+]
+asyncio_mode = "auto"
+
+[tool.coverage.run]
+source = ["src/floatchat"]
+omit = [
+    "*/tests/*",
+    "*/migrations/*",
+    "*/__pycache__/*",
+    "*/venv/*",
+    "*/env/*",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "if TYPE_CHECKING:",
+]
+
+[tool.bandit]
+exclude_dirs = ["tests", "migrations"]
+skips = ["B101", "B601"]
