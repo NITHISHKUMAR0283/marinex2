@@ -33,6 +33,7 @@ venv.bak/
 
 # Database
 *.db
+!floatchat_indian_ocean_enhanced.db
 *.sqlite3
 floatchat_indian_ocean.db
 
