@@ -209,8 +209,190 @@ def analyze_netcdf_structure(
         rprint(f"[red]Error: File {file_path} does not exist[/red]")
         raise typer.Exit(1)
     
-    # This will be implemented in the next step
-    rprint("[yellow]NetCDF analysis functionality will be implemented next[/yellow]")
+    try:
+        import subprocess
+        import sys
+        
+        # Run the analysis script
+        result = subprocess.run([
+            sys.executable, "scripts/analyze_netcdf_structure.py", str(file_path)
+        ], capture_output=True, text=True, cwd=Path.cwd())
+        
+        if result.returncode == 0:
+            rprint(result.stdout)
+        else:
+            rprint(f"[red]Analysis failed:[/red] {result.stderr}")
+            raise typer.Exit(1)
+            
+    except Exception as e:
+        rprint(f"[red]Error running analysis: {e}[/red]")
+        raise typer.Exit(1)
+
+
+@data_app.command("ingest")
+def ingest_netcdf_files(
+    input_dir: Path = typer.Argument(..., help="Directory containing NetCDF files"),
+    pattern: str = typer.Option("*.nc", help="File pattern to match"),
+    recursive: bool = typer.Option(True, help="Search recursively in subdirectories"),
+    max_concurrent: int = typer.Option(5, help="Maximum concurrent file processing"),
+    monitor: bool = typer.Option(False, help="Monitor progress in real-time")
+):
+    """Ingest ARGO NetCDF files into database."""
+    rprint(f"[bold blue]Starting NetCDF ingestion...[/bold blue]")
+    rprint(f"[cyan]Input Directory:[/cyan] {input_dir}")
+    rprint(f"[cyan]Pattern:[/cyan] {pattern}")
+    rprint(f"[cyan]Recursive:[/cyan] {recursive}")
+    rprint(f"[cyan]Max Concurrent:[/cyan] {max_concurrent}")
+    
+    if not input_dir.exists():
+        rprint(f"[red]Error: Directory {input_dir} does not exist[/red]")
+        raise typer.Exit(1)
+    
+    async def run_ingestion():
+        try:
+            from floatchat.data.services.ingestion_service import ingestion_service
+            
+            # Progress callback for monitoring
+            def progress_callback(progress):
+                if monitor:
+                    rprint(f"[cyan]Progress:[/cyan] {progress.completion_percentage:.1f}% "
+                          f"({progress.processed_files}/{progress.total_files}) "
+                          f"- Current: {Path(progress.current_file).name if progress.current_file else 'N/A'}")
+            
+            # Start ingestion
+            job_id = await ingestion_service.start_ingestion(
+                source_path=input_dir,
+                file_pattern=pattern,
+                recursive=recursive,
+                max_concurrent=max_concurrent,
+                progress_callback=progress_callback if monitor else None
+            )
+            
+            rprint(f"[green]✓ Started ingestion job:[/green] {job_id}")
+            
+            if monitor:
+                # Monitor progress
+                rprint("[yellow]Monitoring progress (Ctrl+C to stop monitoring)...[/yellow]")
+                try:
+                    while True:
+                        await asyncio.sleep(5)
+                        status = await ingestion_service.get_job_status(job_id)
+                        
+                        if not status:
+                            break
+                        
+                        if status["status"] in ["completed", "completed_with_errors", "failed", "cancelled"]:
+                            rprint(f"[green]✓ Job {job_id} {status['status']}[/green]")
+                            if "progress" in status:
+                                prog = status["progress"]
+                                rprint(f"[cyan]Final Stats:[/cyan] {prog['processed_files']} processed, "
+                                      f"{prog['failed_files']} failed")
+                            break
+                            
+                except KeyboardInterrupt:
+                    rprint("[yellow]Stopped monitoring (job continues in background)[/yellow]")
+            else:
+                rprint(f"[yellow]Job running in background. Check status with:[/yellow]")
+                rprint(f"floatchat data status {job_id}")
+                
+        except Exception as e:
+            rprint(f"[red]✗ Ingestion failed: {e}[/red]")
+            raise typer.Exit(1)
+    
+    asyncio.run(run_ingestion())
+
+
+@data_app.command("status")
+def ingestion_status(
+    job_id: Optional[str] = typer.Argument(None, help="Specific job ID to check")
+):
+    """Check ingestion job status."""
+    
+    async def check_status():
+        try:
+            from floatchat.data.services.ingestion_service import ingestion_service
+            
+            if job_id:
+                # Check specific job
+                status = await ingestion_service.get_job_status(job_id)
+                if not status:
+                    rprint(f"[red]Job {job_id} not found[/red]")
+                    return
+                
+                rprint(f"[bold]Job Status: {job_id}[/bold]")
+                rprint(f"[cyan]Status:[/cyan] {status['status']}")
+                rprint(f"[cyan]Source:[/cyan] {status['source_path']}")
+                rprint(f"[cyan]Created:[/cyan] {status['created_at']}")
+                
+                if status.get('started_at'):
+                    rprint(f"[cyan]Started:[/cyan] {status['started_at']}")
+                if status.get('completed_at'):
+                    rprint(f"[cyan]Completed:[/cyan] {status['completed_at']}")
+                
+                if status.get('progress'):
+                    prog = status['progress']
+                    rprint(f"[cyan]Progress:[/cyan] {prog['completion_percentage']:.1f}% "
+                          f"({prog['processed_files']}/{prog['total_files']})")
+                    if prog.get('processing_rate') and prog['processing_rate'] > 0:
+                        rprint(f"[cyan]Rate:[/cyan] {prog['processing_rate']:.2f} files/sec")
+                    if prog.get('current_file'):
+                        rprint(f"[cyan]Current File:[/cyan] {Path(prog['current_file']).name}")
+            else:
+                # List all jobs
+                jobs = await ingestion_service.list_active_jobs()
+                
+                if not jobs:
+                    rprint("[yellow]No active ingestion jobs[/yellow]")
+                    return
+                
+                rprint(f"[bold]Active Ingestion Jobs ({len(jobs)}):[/bold]")
+                
+                from rich.table import Table
+                table = Table()
+                table.add_column("Job ID", style="cyan")
+                table.add_column("Status", style="bold")
+                table.add_column("Progress", style="green")
+                table.add_column("Files", style="yellow")
+                
+                for job in jobs:
+                    prog = job.get('progress', {})
+                    progress_str = f"{prog.get('completion_percentage', 0):.1f}%"
+                    files_str = f"{prog.get('processed_files', 0)}/{prog.get('total_files', 0)}"
+                    
+                    table.add_row(
+                        job['job_id'][:20] + "..." if len(job['job_id']) > 20 else job['job_id'],
+                        job['status'],
+                        progress_str,
+                        files_str
+                    )
+                
+                console.print(table)
+                
+        except Exception as e:
+            rprint(f"[red]✗ Status check failed: {e}[/red]")
+            raise typer.Exit(1)
+    
+    asyncio.run(check_status())
+
+
+@data_app.command("sample")  
+def process_sample_data():
+    """Process sample ARGO files for testing."""
+    rprint("[bold blue]Processing sample ARGO data...[/bold blue]")
+    
+    async def process_samples():
+        try:
+            from floatchat.data.services.ingestion_service import ingestion_service
+            
+            job_id = await ingestion_service.process_sample_files()
+            rprint(f"[green]✓ Started sample processing job:[/green] {job_id}")
+            rprint(f"[yellow]Monitor with:[/yellow] floatchat data status {job_id}")
+            
+        except Exception as e:
+            rprint(f"[red]✗ Sample processing failed: {e}[/red]")
+            raise typer.Exit(1)
+    
+    asyncio.run(process_samples())
 
 
 # Database commands group

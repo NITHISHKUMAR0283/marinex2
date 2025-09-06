@@ -1,0 +1,45 @@
+# Git Commands to Push FloatChat to GitHub
+
+# 1. Initialize Git repository (if not already done)
+git init
+
+# 2. Add your GitHub repository as remote
+git remote add origin https://github.com/NITHISHKUMAR0283/marinex2.git
+
+# 3. Add all files to staging
+git add .
+
+# 4. Create initial commit
+git commit -m "Initial commit: Complete FloatChat oceanographic AI system for SIH 2025
+
+Features:
+- Multi-modal embeddings (text + spatial + temporal + parametric)
+- Production FAISS vector database with hybrid search
+- RAG pipeline with advanced retrieval
+- Multi-LLM orchestration (OpenAI, Anthropic, Groq)
+- Model Context Protocol integration
+- Natural language to SQL engine
+- Interactive Streamlit interface
+- Comprehensive testing suite
+- 960K+ ARGO float measurements
+- 120+ floats with 2000m depth coverage
+
+Built for Smart India Hackathon 2025"
+
+# 5. Push to GitHub
+git branch -M main
+git push -u origin main
+
+# If you get authentication errors, you may need to:
+# - Set up SSH keys, or
+# - Use personal access token for HTTPS
+echo "
+Setup complete! Run these commands in your terminal:
+cd F:/float/floatchat-sih2025
+git init
+git remote add origin https://github.com/NITHISHKUMAR0283/marinex2.git
+git add .
+git commit -m 'Initial commit: FloatChat SIH 2025'
+git branch -M main
+git push -u origin main
+"

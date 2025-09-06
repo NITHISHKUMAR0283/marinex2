@@ -10,7 +10,8 @@ from pathlib import Path
 from typing import Optional, List, Dict, Any
 from functools import lru_cache
 
-from pydantic import BaseSettings, Field, validator, PostgresDsn, RedisDsn
+from pydantic import Field, validator
+from pydantic_settings import BaseSettings
 from pydantic.networks import AnyHttpUrl
 
 

@@ -11,10 +11,11 @@ from uuid import UUID
 
 from geoalchemy2 import Geometry
 from sqlalchemy import (
-    Column, Integer, String, Float, Boolean, DateTime, Date, 
+    Column, Integer, String, Boolean, DateTime, Date, 
     ForeignKey, Text, ARRAY, CheckConstraint, UniqueConstraint,
     BigInteger, REAL, CHAR, Index, func, text
 )
+from sqlalchemy.types import Float as FloatType
 from sqlalchemy.dialects.postgresql import UUID as PostgresUUID, NUMRANGE
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, validates
@@ -87,8 +88,8 @@ class Float(Base):
     
     # Deployment information
     deployment_date = Column(Date)
-    deployment_latitude = Column(Float)
-    deployment_longitude = Column(Float)
+    deployment_latitude = Column(FloatType)
+    deployment_longitude = Column(FloatType)
     deployment_geom = Column(Geometry('POINT', srid=4326))
     
     # Mission details
@@ -155,12 +156,12 @@ class Profile(Base):
     profile_filename = Column(String(255))
     
     # Spatial-temporal information
-    latitude = Column(Float, nullable=False)
-    longitude = Column(Float, nullable=False)
+    latitude = Column(FloatType, nullable=False)
+    longitude = Column(FloatType, nullable=False)
     geom = Column(Geometry('POINT', srid=4326))
     
     # Temporal information
-    juld = Column(Float)
+    juld = Column(FloatType)
     measurement_date = Column(DateTime(timezone=True), nullable=False)
     measurement_year = Column(Integer)
     measurement_month = Column(Integer)
@@ -172,11 +173,11 @@ class Profile(Base):
     vertical_sampling_scheme = Column(Text)
     
     # Profile summary statistics
-    max_depth_m = Column(Float)
-    min_temperature_c = Column(Float)
-    max_temperature_c = Column(Float)
-    min_salinity_psu = Column(Float)
-    max_salinity_psu = Column(Float)
+    max_depth_m = Column(FloatType)
+    min_temperature_c = Column(FloatType)
+    max_temperature_c = Column(FloatType)
+    min_salinity_psu = Column(FloatType)
+    max_salinity_psu = Column(FloatType)
     valid_measurements_count = Column(Integer, default=0)
     
     # Quality flags for entire profile
