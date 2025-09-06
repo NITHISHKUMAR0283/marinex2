@@ -25,8 +25,8 @@ Edit `.env` with these API keys:
 OPENAI_API_KEY=your_openai_key_here
 ANTHROPIC_API_KEY=your_anthropic_key_here
 
-# Provided Groq API key for demo:
-GROQ_API_KEY=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
+# Provided Groq API key for demo (contact team for key):
+GROQ_API_KEY=provided_by_sih_team
 ```
 
 ### 4. Initialize Database
@@ -43,10 +43,10 @@ Visit: http://localhost:8501
 
 ## Demo API Key Information
 
-For Smart India Hackathon 2025 demonstration, a Groq API key is provided:
-- **API Key**: `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`
+For Smart India Hackathon 2025 demonstration, a Groq API key is available:
 - **Provider**: Groq (Llama3-70B model)
 - **Usage**: Fast inference for oceanographic queries
+- **Access**: Contact SIH team for demonstration API key
 - **Quota**: Sufficient for hackathon demonstration
 
 ## System Requirements
