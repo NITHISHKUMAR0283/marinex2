@@ -35,7 +35,7 @@ class GroqClient:
         self.settings = get_settings()
         
         # Initialize Groq client (OpenAI-compatible)
-        api_key = self.config.get('api_key', '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')
+        api_key = self.config.get('api_key', os.getenv('GROQ_API_KEY', ''))
         
         self.client = AsyncOpenAI(
             api_key=api_key,

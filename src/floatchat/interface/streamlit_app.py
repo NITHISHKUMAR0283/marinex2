@@ -130,7 +130,7 @@ class FloatChatApp:
                         temperature=0.1
                     ),
                     LLMProvider.GROQ: LLMConfig(
-                        api_key='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',
+                        api_key=os.getenv('GROQ_API_KEY', ''),
                         model_name='llama3-70b-8192',
                         max_tokens=4000,
                         temperature=0.1
