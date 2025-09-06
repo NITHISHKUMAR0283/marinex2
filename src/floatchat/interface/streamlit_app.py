@@ -252,7 +252,7 @@ class FloatChatApp:
             
             # Process query
             if submit_button and user_query:
-                await self.process_user_query(user_query)
+                asyncio.run(self.process_user_query(user_query))
     
     async def process_user_query(self, query: str):
         """Process user query through the AI pipeline."""
