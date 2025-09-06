@@ -15,7 +15,7 @@ from typing import Dict, List, Optional, Any
 
 # Import FloatChat AI components
 from ..ai.rag.rag_pipeline import OceanographicRAGPipeline
-from ..ai.llm.llm_orchestrator import LLMOrchestrator, LLMProvider, LLMConfig
+from ..ai.llm.groq_orchestrator import LLMOrchestrator, LLMProvider, LLMConfig
 from ..ai.nl2sql.nl2sql_engine import NL2SQLEngine
 from ..ai.vector_database.faiss_vector_store import OceanographicVectorStore
 from ..core.database import DatabaseManager
@@ -115,25 +115,13 @@ class FloatChatApp:
                     dimension=1536
                 )
                 
-                # Initialize LLM orchestrator with all providers
+                # Initialize LLM orchestrator with Groq (free models)
                 llm_configs = {
-                    LLMProvider.OPENAI: LLMConfig(
-                        api_key=os.getenv('OPENAI_API_KEY', ''),
-                        model_name='gpt-4-turbo-preview',
-                        max_tokens=4000,
-                        temperature=0.1
-                    ),
-                    LLMProvider.ANTHROPIC: LLMConfig(
-                        api_key=os.getenv('ANTHROPIC_API_KEY', ''),
-                        model_name='claude-3-sonnet-20240229',
-                        max_tokens=4000,
-                        temperature=0.1
-                    ),
                     LLMProvider.GROQ: LLMConfig(
-                        api_key=os.getenv('GROQ_API_KEY', ''),
-                        model_name='llama3-70b-8192',
-                        max_tokens=4000,
-                        temperature=0.1
+                        api_key=os.getenv('GROQ_API_KEY', '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'),
+                        model_name='llama-3.1-70b-versatile',  # Free Groq model
+                        max_tokens=8192,
+                        temperature=0.2
                     )
                 }
                 
@@ -166,7 +154,7 @@ class FloatChatApp:
         with col2:
             st.metric("Measurements", "960K+", "2000m Depth")
         with col3:
-            st.metric("AI Models", "3 Providers", "RAG + MCP")
+            st.metric("AI Power", "Groq Llama3", "Fast + Free")
     
     def render_sidebar(self):
         """Render the application sidebar with controls."""
@@ -183,13 +171,19 @@ class FloatChatApp:
             
             st.divider()
             
-            # LLM Provider Selection
+            # LLM Model Selection (Groq only)
             st.header("🤖 AI Configuration")
-            selected_provider = st.selectbox(
-                "Primary LLM Provider",
-                ["OpenAI GPT-4", "Anthropic Claude", "Groq Llama3"],
+            selected_model = st.selectbox(
+                "Groq Model",
+                ["Llama-3.1-70B (Balanced)", "Llama-3.1-8B (Fast)"],
                 index=0
             )
+            
+            # Update model based on selection
+            if selected_model == "Llama-3.1-8B (Fast)":
+                st.session_state.selected_model = "llama-3.1-8b-instant"
+            else:
+                st.session_state.selected_model = "llama-3.1-70b-versatile"
             
             # Query mode selection
             query_mode = st.radio(

@@ -12,10 +12,8 @@ from dataclasses import dataclass
 from enum import Enum
 import random
 
-from .openai_client import OpenAIClient, LLMResponse
-from .anthropic_client import AnthropicClient
+from .groq_client import GroqClient
 from .mcp_integration import MCPOrchestrator, ToolExecutionResult
-from ..rag import RAGContext, RAGPipeline
 from ...core.config import get_settings
 
 logger = logging.getLogger(__name__)
@@ -23,9 +21,7 @@ logger = logging.getLogger(__name__)
 
 class LLMProvider(Enum):
     """Supported LLM providers."""
-    OPENAI = "openai"
-    ANTHROPIC = "anthropic"
-    AUTO = "auto"  # Intelligent routing
+    GROQ = "groq"
 
 
 @dataclass
@@ -35,7 +31,7 @@ class LLMConfig:
     model: str
     max_tokens: int
     temperature: float
-    fallback_provider: Optional[LLMProvider] = None
+    fallback_provider: Optional[LLMProvider] = LLMProvider.GROQ
     use_tools: bool = True
     stream_response: bool = False
 

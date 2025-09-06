@@ -22,7 +22,73 @@ except ImportError as e:
 
 from ...core.config import get_settings
 from ..rag import RAGContext
-from .openai_client import LLMResponse, OceanographicPromptEngineering
+# Define necessary classes locally to avoid dependencies
+
+@dataclass
+class LLMResponse:
+    """Response from LLM with metadata."""
+    content: str
+    model: str
+    tokens_used: int
+    response_time: float
+    confidence_score: float
+    reasoning_steps: List[str]
+    citations: List[str]
+    metadata: Dict[str, Any]
+
+class OceanographicPromptEngineering:
+    """Prompt engineering for oceanographic domain."""
+    
+    @staticmethod
+    def create_system_prompt() -> str:
+        """Create system prompt for oceanographic AI assistant."""
+        return """You are FloatChat, an expert oceanographic AI assistant specializing in ARGO float data analysis and marine science. Your expertise includes:
+
+CORE COMPETENCIES:
+- Oceanographic data interpretation (temperature, salinity, pressure, oxygen)
+- ARGO float technology and operations
+- Marine environmental analysis
+- Spatial and temporal oceanographic patterns
+- Indian Ocean dynamics and characteristics
+
+RESPONSE GUIDELINES:
+1. Provide scientifically accurate information
+2. Include confidence levels in your responses
+3. Cite relevant oceanographic principles
+4. Explain technical concepts clearly
+5. Suggest follow-up analyses when appropriate
+
+INDIAN OCEAN FOCUS:
+- Arabian Sea characteristics
+- Bay of Bengal dynamics  
+- Equatorial currents and patterns
+- Seasonal monsoon effects
+- Deep water circulation
+
+Always maintain scientific rigor while being accessible to researchers and students."""
+
+    @staticmethod
+    def create_query_prompt(query: str, context: Optional[str] = None) -> str:
+        """Create query-specific prompt with context."""
+        base_prompt = f"USER QUESTION: {query}\n\n"
+        
+        if context:
+            base_prompt += f"RELEVANT CONTEXT:\n{context}\n\n"
+        
+        base_prompt += """Please provide a comprehensive answer that:
+1. Directly addresses the question
+2. Incorporates the provided context
+3. Explains relevant oceanographic concepts
+4. Includes confidence assessment
+5. Suggests related analyses if applicable
+
+FORMAT YOUR RESPONSE:
+- Start with a direct answer
+- Provide supporting details
+- Include confidence level (High/Medium/Low)
+- End with suggested follow-up questions if relevant"""
+        
+        return base_prompt
 
 logger = logging.getLogger(__name__)
 
@@ -44,17 +110,17 @@ class GroqClient:
             max_retries=0  # We handle retries manually
         )
         
-        # Model configuration optimized for different use cases
+        # Model configuration optimized for different use cases (free Groq models)
         self.model_configs = {
             'fast': {
-                'model': 'llama-3.1-8b-instant',
-                'max_tokens': 8000,
+                'model': 'llama-3.1-8b-instant',  # Free, very fast
+                'max_tokens': 8192,
                 'temperature': 0.2,
                 'use_case': 'Quick responses, simple queries'
             },
             'balanced': {
-                'model': 'llama-3.3-70b-versatile', 
-                'max_tokens': 32768,
+                'model': 'llama-3.1-70b-versatile',  # Free, powerful
+                'max_tokens': 8192,
                 'temperature': 0.3,
                 'use_case': 'Complex analysis, reasoning'
             },

@@ -11,8 +11,9 @@
 ## Features
 - Multi-Modal AI Embeddings
 - RAG Pipeline with FAISS
-- Multi-LLM Support (OpenAI, Anthropic, Groq)
+- Groq Llama3 AI (Free & Fast)
 - 960K+ oceanographic measurements
 - Interactive Streamlit interface
+- No API key setup required!
 
-Built for SIH 2025
+Built for SIH 2025 - Ready to run out of the box!

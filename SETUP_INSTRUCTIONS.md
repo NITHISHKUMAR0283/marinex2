@@ -13,20 +13,13 @@ cd marinex2
 pip install -r requirements.txt
 ```
 
-### 3. Configure API Keys
-Create a `.env` file:
+### 3. Configure API Key (Pre-configured!)
+**No setup needed!** The system comes with Groq API key pre-configured.
+
+Optional: Create `.env` file if you want to use your own key:
 ```bash
-cp .env.example .env
-```
-
-Edit `.env` with these API keys:
-```
-# For full functionality, add your API keys:
-OPENAI_API_KEY=your_openai_key_here
-ANTHROPIC_API_KEY=your_anthropic_key_here
-
-# Provided Groq API key for demo (contact team for key):
-GROQ_API_KEY=provided_by_sih_team
+# Only if you have your own Groq API key:
+GROQ_API_KEY=your_groq_key_here
 ```
 
 ### 4. Initialize Database
