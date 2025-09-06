@@ -5,6 +5,7 @@ Optimized for oceanographic queries with high-speed processing.
 
 import asyncio
 import logging
+import os
 from typing import Dict, List, Optional, Union, AsyncGenerator, Any
 from datetime import datetime
 import json
