@@ -116,14 +116,63 @@ python main.py
 ```
 **Features**: Launches comprehensive Streamlit application
 
+## 📁 Repository Structure
+
+```
+marinex2/
+├── 📊 DATA & DATABASE
+│   └── floatchat_indian_ocean_enhanced.db    # 43MB Real ARGO data (752K+ measurements)
+│
+├── 🚀 APPLICATION ENTRY POINTS
+│   ├── main.py                               # Main Streamlit application launcher
+│   ├── floatchat_complete.py                 # Complete system with real AI (RECOMMENDED)
+│   ├── streamlit_demo.py                     # Demo version with simulated responses
+│   └── demo_floatchat.py                     # CLI demo and system status check
+│
+├── 🔧 SETUP & CONFIGURATION
+│   ├── enhanced_indian_ocean_setup.py        # Database setup script (752K+ records)
+│   ├── requirements.txt                      # Python dependencies
+│   └── .gitignore                           # Git ignore configuration
+│
+├── 🏗️ SOURCE CODE ARCHITECTURE
+│   └── src/floatchat/
+│       ├── ai/                              # AI & Machine Learning
+│       │   ├── embeddings/                  # Multi-modal embeddings
+│       │   ├── llm/                         # LLM integration (Groq, OpenAI)
+│       │   └── nl2sql/                      # Natural Language to SQL
+│       ├── core/                            # Core database management
+│       ├── data/                            # Data processing services
+│       ├── interface/                       # Streamlit web interface
+│       └── utils/                           # Utility functions
+│
+├── 🧪 TESTING & VALIDATION
+│   └── tests/
+│       ├── test_integration.py               # Integration tests
+│       ├── performance_tests.py             # Performance benchmarks
+│       └── test_*.py                        # Unit tests
+│
+└── 📚 COMPREHENSIVE DOCUMENTATION
+    ├── README.md                            # This file - Setup & usage guide
+    ├── MASTER_DEVELOPMENT_GUIDE.md          # Complete system architecture
+    ├── SESSION_CACHE_COMPREHENSIVE.md       # Development history & context
+    ├── PROJECT_IMPLEMENTATION_GUIDE.md      # Technical implementation details
+    ├── REQUIREMENTS_ANALYSIS_DEEP.md        # SIH 2025 requirements analysis
+    ├── PERFORMANCE_OPTIMIZATION_FRAMEWORK.md # System optimization strategies
+    ├── ITERATION_TRACKER_COMPREHENSIVE.md   # Development progress tracking
+    ├── RISK_ANALYSIS_COMPREHENSIVE.md       # Risk assessment & mitigation
+    ├── PROJECT_TODO_MASTER.md               # Project roadmap & tasks
+    ├── CLAUDE_PROMPTS_LIBRARY_OPTIMIZED.md  # AI prompt engineering library
+    └── NEXT_SESSION_GUIDE.md                # Continuation guide for developers
+```
+
 ## 🏗️ System Architecture
 
 ```
 FloatChat System Architecture
 ├── Data Layer
-│   ├── SQLite Database (960K+ measurements)
-│   ├── ARGO Float Profiles (120+ floats)
-│   └── Depth Coverage (0-2000m, 25m intervals)
+│   ├── SQLite Database (752K+ real measurements)
+│   ├── ARGO Float Profiles (9,646+ profiles)
+│   └── Depth Coverage (0-2000m, full water column)
 ├── AI Layer  
 │   ├── Multi-Modal Embeddings
 │   ├── FAISS Vector Database
