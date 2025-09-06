@@ -23,7 +23,7 @@ async def test_groq_setup():
         from floatchat.ai.llm.groq_client import GroqClient
         
         groq_client = GroqClient({
-            'api_key': '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',
+            'api_key': os.getenv('GROQ_API_KEY', 'your-groq-api-key-here'),
             'model': 'llama-3.1-70b-versatile'
         })
         print("   ✅ Groq client initialized")
@@ -34,7 +34,7 @@ async def test_groq_setup():
         
         llm_config = {
             LLMProvider.GROQ: LLMConfig(
-                api_key='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',
+                api_key=os.getenv('GROQ_API_KEY', 'your-groq-api-key-here'),
                 model_name='llama-3.1-70b-versatile'
             )
         }
